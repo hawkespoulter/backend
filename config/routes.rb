@@ -10,5 +10,7 @@ Rails.application.routes.draw do
     registrations: 'users/registrations'
   }
 
+  resources :lobbies
+
   get '/current_user', to: 'current_user#index'
 end
