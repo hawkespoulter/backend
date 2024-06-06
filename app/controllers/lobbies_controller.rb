@@ -6,7 +6,15 @@ class LobbiesController < ApplicationController
 
   # GET /lobbies
   def index
-    @lobbies = Lobby.all
+    # Also gets the lobby's total player_count
+    @lobbies = Lobby.includes(:user_lobbies).map do |lobby|
+      {
+        id: lobby.id,
+        game: lobby.game,
+        is_active: lobby.is_active,
+        player_count: lobby.user_lobbies.count
+      }
+    end
 
     render json: @lobbies
   end
@@ -60,6 +68,6 @@ class LobbiesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def lobby_params
-    params.require(:lobby).permit(:name, :capacity, :description, :is_active)
+    params.require(:lobby).permit(:game, :player_count, :is_active)
   end
 end
