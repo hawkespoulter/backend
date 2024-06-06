@@ -12,16 +12,12 @@ class LobbiesController < ApplicationController
         id: lobby.id,
         game: lobby.game,
         is_active: lobby.is_active,
-        player_count: lobby.user_lobbies.count
-      }
-
-      # Include owner information conditionally
-      if current_user == lobby.owner
-        lobby_data[:owner] = {
+        player_count: lobby.user_lobbies.count,
+        owner: {
           id: lobby.owner_id,
           name: lobby.owner.name
         }
-      end
+      }
 
       lobby_data
     end
