@@ -8,12 +8,22 @@ class LobbiesController < ApplicationController
   def index
     # Also gets the lobby's total player_count
     @lobbies = Lobby.includes(:user_lobbies).map do |lobby|
-      {
+      lobby_data = {
         id: lobby.id,
         game: lobby.game,
         is_active: lobby.is_active,
         player_count: lobby.user_lobbies.count
       }
+
+      # Include owner information conditionally
+      if current_user == lobby.owner
+        lobby_data[:owner] = {
+          id: lobby.owner_id,
+          name: lobby.owner.name
+        }
+      end
+
+      lobby_data
     end
 
     render json: @lobbies
@@ -36,6 +46,9 @@ class LobbiesController < ApplicationController
   # POST /lobbies
   def create
     @lobby = Lobby.new(lobby_params)
+    
+    # Set the owner of the lobby
+    @lobby.owner = current_user
 
     # Associate the current user with the lobby
     @user_lobby = @lobby.user_lobbies.build(user: current_user)
