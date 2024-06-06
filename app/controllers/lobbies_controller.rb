@@ -37,7 +37,10 @@ class LobbiesController < ApplicationController
   def create
     @lobby = Lobby.new(lobby_params)
 
-    if @lobby.save
+    # Associate the current user with the lobby
+    @user_lobby = @lobby.user_lobbies.build(user: current_user)
+
+    if @lobby.save && @user_lobby.save
       redirect_to @lobby, notice: 'Lobby was successfully created.'
     else
       render :new
@@ -68,6 +71,6 @@ class LobbiesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def lobby_params
-    params.require(:lobby).permit(:game, :player_count, :is_active)
+    params.require(:lobby).permit(:game, :is_active)
   end
 end
