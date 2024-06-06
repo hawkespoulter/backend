@@ -58,10 +58,19 @@ class LobbiesController < ApplicationController
 
   # PATCH/PUT /lobbies/1
   def update
-    if @lobby.update(lobby_params)
-      redirect_to @lobby, notice: 'Lobby was successfully updated.'
+    # Check if the current user is already in the lobby
+    if current_user.in_lobby?(@lobby)
+      # If the current user is already in the lobby, tell in the frontend
+      render json: @lobby, status: :ok
     else
-      render :edit
+      # If the current user is not in the lobby, add them to the lobby
+      @user_lobby = @lobby.user_lobbies.build(user: current_user)
+
+      if @user_lobby.save
+        redirect_to @lobby, notice: 'Joined lobby.'
+      else
+        render :edit
+      end
     end
   end
 

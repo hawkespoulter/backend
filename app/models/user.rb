@@ -8,4 +8,9 @@ class User < ApplicationRecord
   has_many :owned_lobbies, class_name: 'Lobby', foreign_key: 'owner_id' # Allows a user to own a lobby
   has_many :user_lobbies
   has_many :lobbies, through: :user_lobbies
+
+  # Check if the user is in a lobby by checking the UserLobbies table
+  def in_lobby?(lobby)
+    user_lobbies.exists?(lobby_id: lobby.id)
+  end
 end
