@@ -3,4 +3,8 @@ class User < ApplicationRecord
 
   devise :database_authenticatable, :registerable, :validatable,
          :jwt_authenticatable, jwt_revocation_strategy: self
+
+  # Establish relationships
+  has_many :user_lobbies
+  has_many :lobbies, through: :user_lobbies
 end
