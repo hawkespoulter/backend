@@ -16,7 +16,8 @@ class LobbiesController < ApplicationController
         owner: {
           id: lobby.owner_id,
           name: lobby.owner.name
-        }
+        },
+        joined: current_user.in_lobby?(lobby) # Tell the frontend if the current user is in the lobby or not
       }
 
       lobby_data
@@ -25,7 +26,7 @@ class LobbiesController < ApplicationController
     render json: @lobbies
   end
 
-  # GET /lobbies/1
+  # GET /lobbies/:id
   def show
     render json: @lobby
   end
@@ -35,7 +36,7 @@ class LobbiesController < ApplicationController
     @lobby = Lobby.new
   end
 
-  # GET /lobbies/1/edit
+  # GET /lobbies/:id/edit
   def edit
   end
 
@@ -56,7 +57,7 @@ class LobbiesController < ApplicationController
     end
   end
 
-  # PATCH/PUT /lobbies/1
+  # PATCH/PUT /lobbies/:id
   def update
     # Check if the current user is already in the lobby
     if current_user.in_lobby?(@lobby)
@@ -74,7 +75,24 @@ class LobbiesController < ApplicationController
     end
   end
 
-  # DELETE /lobbies/1
+  # POST /lobbies/:id/leave
+  def leave
+    @lobby = Lobby.find(params[:id])
+  
+    # Check if the current user is in the lobby
+    if current_user.in_lobby?(@lobby)
+      # Find and destroy the user_lobby association
+      user_lobby = @lobby.user_lobbies.find_by(user: current_user)
+      user_lobby.destroy
+  
+      render json: { message: 'You have left the lobby successfully' }, status: :ok
+    else
+      render json: { error: 'You are not in this lobby' }, status: :unprocessable_entity
+    end
+  end
+  
+
+  # DELETE /lobbies/:id
   def destroy
     @lobby.destroy
     redirect_to lobbies_url, notice: 'Lobby was successfully destroyed.'
