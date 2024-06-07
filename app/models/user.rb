@@ -13,4 +13,9 @@ class User < ApplicationRecord
   def in_lobby?(lobby)
     user_lobbies.exists?(lobby_id: lobby.id)
   end
+
+  # Check if the user is the owner of the lobby
+  def is_lobby_owner?(lobby)
+    id == lobby.owner_id
+  end
 end

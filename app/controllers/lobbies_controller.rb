@@ -94,8 +94,14 @@ class LobbiesController < ApplicationController
 
   # DELETE /lobbies/:id
   def destroy
-    @lobby.destroy
-    redirect_to lobbies_url, notice: 'Lobby was successfully destroyed.'
+    # Only allow the lobby owner to delete the lobby
+    if current_user.is_lobby_owner?(@lobby)
+      @lobby = Lobby.find(params[:id])
+      @lobby.destroy
+      render json: { message: 'Lobby was successfully destroyed.' }, status: :ok
+    else
+      render json: { message: "User isn't the lobby owner" }, status: :error
+    end
   end
 
   private
