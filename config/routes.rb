@@ -13,6 +13,7 @@ Rails.application.routes.draw do
 
   resources :lobbies do
     member do
+      post 'join'
       post 'leave'
     end
   end

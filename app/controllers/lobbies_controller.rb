@@ -59,11 +59,20 @@ class LobbiesController < ApplicationController
 
   # PATCH/PUT /lobbies/:id
   def update
+    # Do we use this? Or do we just make custom defs like `def join` for lobby actions
+
+    redirect_to @lobby, notice: 'Updated lobby.'
+  end
+
+  # POST /lobbies/:id/join
+  def join
     # Check if the current user is already in the lobby
+    @lobby = Lobby.find(params[:id])
     if current_user.in_lobby?(@lobby)
       # If the current user is already in the lobby, tell in the frontend
       render json: @lobby, status: :ok
     else
+      logger.info("ADDING USER TO LOBBY")
       # If the current user is not in the lobby, add them to the lobby
       @user_lobby = @lobby.user_lobbies.build(user: current_user)
 
