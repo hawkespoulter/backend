@@ -36,7 +36,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_11_201015) do
     t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "player_number"
+    t.integer "player_number", null: false
     t.index ["lobby_id"], name: "index_user_lobbies_on_lobby_id"
     t.index ["user_id"], name: "index_user_lobbies_on_user_id"
   end
