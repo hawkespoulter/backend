@@ -7,7 +7,7 @@ class LobbiesController < ApplicationController
   # GET /lobbies
   def index
     # Also gets the lobby's total player_count
-    @lobbies = Lobby.includes(:user_lobbies).map do |lobby|
+    @lobbies = Lobby.includes(user_lobbies: :user).map do |lobby|
       lobby_data = {
         id: lobby.id,
         game: lobby.game,
@@ -17,7 +17,14 @@ class LobbiesController < ApplicationController
           id: lobby.owner_id,
           name: lobby.owner.name
         },
-        joined: current_user.in_lobby?(lobby) # Tell the frontend if the current user is in the lobby or not
+        joined: current_user.in_lobby?(lobby), # Tell the frontend if the current user is in the lobby or not
+        players: lobby.user_lobbies.map do |user_lobby| # Get the list of players with their id, name, and number
+          {
+            id: user_lobby.user_id,
+            name: user_lobby.user.name,
+            player_number: user_lobby.player_number
+          }
+        end,
       }
 
       lobby_data
