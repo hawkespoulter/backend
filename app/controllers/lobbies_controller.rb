@@ -43,15 +43,21 @@ class LobbiesController < ApplicationController
   # POST /lobbies
   def create
     @lobby = Lobby.new(lobby_params)
-    
+  
     # Set the owner of the lobby
     @lobby.owner = current_user
-
-    # Associate the current user with the lobby
-    @user_lobby = @lobby.user_lobbies.build(user: current_user)
-
-    if @lobby.save && @user_lobby.save
-      redirect_to @lobby, notice: 'Lobby was successfully created.'
+  
+    # Save the lobby first
+    if @lobby.save
+      # Set the player number to 1 for the owner
+      @user_lobby = @lobby.user_lobbies.build(user: current_user, player_number: 1)
+      
+      if @user_lobby.save
+        redirect_to @lobby, notice: 'Lobby was successfully created.'
+      else
+        @lobby.destroy
+        render :new
+      end
     else
       render :new
     end
@@ -72,9 +78,9 @@ class LobbiesController < ApplicationController
       # If the current user is already in the lobby, tell in the frontend
       render json: @lobby, status: :ok
     else
-      logger.info("ADDING USER TO LOBBY")
       # If the current user is not in the lobby, add them to the lobby
-      @user_lobby = @lobby.user_lobbies.build(user: current_user)
+      newPlayerNumber = @lobby.user_lobbies.count + 1 # Increment the current player count by 1 to get the proper player number
+      @user_lobby = @lobby.user_lobbies.build(user: current_user, player_number: newPlayerNumber)
 
       if @user_lobby.save
         redirect_to @lobby, notice: 'Joined lobby.'
