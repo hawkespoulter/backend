@@ -49,6 +49,13 @@ class LobbiesController < ApplicationController
 
   # POST /lobbies
   def create
+    # Check if user already owns a lobby
+    if current_user.owns_lobby?
+      redirect_to lobbies_path, alert: 'You cannot join a new lobby because you already own or are part of a lobby.'
+      return
+    end
+
+    # Create a new lobby
     @lobby = Lobby.new(lobby_params)
   
     # Set the owner of the lobby
@@ -79,6 +86,12 @@ class LobbiesController < ApplicationController
 
   # POST /lobbies/:id/join
   def join
+    # Check if the user has already joined a lobby (that they do not own)
+    if current_user.in_any_lobby?
+      redirect_to lobbies_path, alert: 'You cannot join a new lobby because you already own or are part of a lobby.'
+      return
+    end
+
     # Check if the current user is already in the lobby
     @lobby = Lobby.find(params[:id])
     if current_user.in_lobby?(@lobby)
