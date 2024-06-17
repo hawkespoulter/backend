@@ -11,12 +11,13 @@ class User < ApplicationRecord
 
   # Check if the user is in a lobby by checking the UserLobbies table
   def in_lobby?(lobby)
-    logger.info("user in lobby #{lobby.id} ?")
+    # logger.info("user in lobby #{lobby.id} ?")
     user_lobbies.exists?(lobby_id: lobby.id)
   end
 
   # Check if the user is the owner of the lobby
   def is_lobby_owner?(lobby)
+    # logger.info("user owns lobby #{lobby.id} ?")
     id == lobby.owner_id
   end
 

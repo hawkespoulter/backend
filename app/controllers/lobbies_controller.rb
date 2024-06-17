@@ -51,7 +51,8 @@ class LobbiesController < ApplicationController
   def create
     # Check if user already owns a lobby
     if current_user.owns_lobby?
-      redirect_to lobbies_path, alert: 'You cannot join a new lobby because you already own or are part of a lobby.'
+      # logger.info("******* USER ALREADY OWNS A LOBBY")
+      render json: { error: 'You already own another lobby.' }, status: :unprocessable_entity
       return
     end
 
@@ -86,17 +87,23 @@ class LobbiesController < ApplicationController
 
   # POST /lobbies/:id/join
   def join
-    # Check if the user has already joined a lobby (that they do not own)
-    if current_user.in_any_lobby?
-      redirect_to lobbies_path, alert: 'You cannot join a new lobby because you already own or are part of a lobby.'
-      return
-    end
-
-    # Check if the current user is already in the lobby
     @lobby = Lobby.find(params[:id])
-    if current_user.in_lobby?(@lobby)
+
+    # If the user is the owner, push them to the lobby page
+    if current_user.is_lobby_owner?(@lobby)
+      # logger.info("******* USER OWNS THIS LOBBY: #{params[:id]}")
+      redirect_to @lobby, notice: 'Joined lobby.', status: :ok
+      return
+    elsif current_user.in_lobby?(@lobby)
+      # Check if the user is already in the lobby
+      # logger.info("******* USER ALREADY JOINED THIS LOBBY: #{params[:id]}")
       # If the current user is already in the lobby, tell in the frontend
       render json: @lobby, status: :ok
+    elsif current_user.in_any_lobby?
+      # Check if the user already joined another lobby
+      # logger.info("******* USER CAN'T JOIN. ALREADY JOINED A LOBBY")
+      render json: { error: 'You are already in another lobby.' }, status: :unprocessable_entity
+      return
     else
       # If the current user is not in the lobby, add them to the lobby
       newPlayerNumber = @lobby.user_lobbies.count + 1 # Increment the current player count by 1 to get the proper player number
