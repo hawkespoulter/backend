@@ -7,7 +7,7 @@ class LobbiesController < ApplicationController
   # GET /lobbies
   def index
     # Also gets the lobby's total player_count
-    @lobbies = Lobby.includes(user_lobbies: :user).map do |lobby|
+    @lobbies = Lobby.includes(user_lobbies: :user).order(:id).map do |lobby|
       lobby_data = {
         id: lobby.id,
         game: lobby.game,
