@@ -11,7 +11,12 @@ Rails.application.routes.draw do
     registrations: 'users/registrations'
   }
 
-  resources :lobbies
+  resources :lobbies do
+    member do
+      post 'join'
+      post 'leave'
+    end
+  end
 
   get '/current_user', to: 'current_user#index'
 end

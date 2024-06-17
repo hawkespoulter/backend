@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_05_194232) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_11_201015) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -25,6 +25,20 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_05_194232) do
     t.string "game"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "is_active", default: false, null: false
+    t.integer "player_count", default: 0, null: false
+    t.bigint "owner_id", null: false
+    t.index ["owner_id"], name: "index_lobbies_on_owner_id"
+  end
+
+  create_table "user_lobbies", force: :cascade do |t|
+    t.bigint "lobby_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "player_number", null: false
+    t.index ["lobby_id"], name: "index_user_lobbies_on_lobby_id"
+    t.index ["user_id"], name: "index_user_lobbies_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -43,4 +57,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_05_194232) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "lobbies", "users", column: "owner_id"
+  add_foreign_key "user_lobbies", "lobbies"
+  add_foreign_key "user_lobbies", "users"
 end
